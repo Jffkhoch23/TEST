@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Modal</title>
+  <style>
+    body { font-family: sans-serif; margin:0; }
+    .modal-overlay { 
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; 
+      justify-content: center; align-items: center; z-index: 50;
+    }
+    .modal { 
+      background: #fff; border-radius: 12px; max-width: 600px; width: 90%; 
+      max-height: 90vh; overflow-y: auto; position: relative;
+      display: flex; flex-direction: column; 
+    }
+    .modal img { width: 100%; border-radius: 12px 12px 0 0; }
+    .modal-header { display: flex; justify-content: space-between; padding: 1rem; }
+    .modal-content { padding: 1rem; }
+    .buttons { display: flex; gap: 0.5rem; margin-top: 1rem; }
+    .button { flex: 1; padding: 1rem; border:none; border-radius: 12px; cursor:pointer; font-weight:bold; }
+    .button-buy { background: #f97316; color:#fff; }
+    .button-cart { background: transparent; border: 2px solid #f97316; color:#f97316; }
+    .close-btn { cursor:pointer; font-weight:bold; font-size:1.2rem; }
+    .dots { display: flex; justify-content:center; gap:0.3rem; margin-top:0.5rem; }
+    .dot { width:8px; height:8px; border-radius:50%; background:#ccc; cursor:pointer; }
+    .dot.active { width:24px; background:#f97316; }
+  </style>
+</head>
+<body>
+
+<!-- Button um Modal zu öffnen -->
+<button id="openModal">Produkt anzeigen</button>
+
+<!-- Modal -->
+<div id="modalOverlay" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h2 id="productName">Produkt Name</h2>
+        <p id="productPrice">€0.00</p>
+      </div>
+      <span class="close-btn" id="closeModal">X</span>
+    </div>
+    <div class="modal-content">
+      <img id="productImage" src="" alt="Produkt">
+      <div class="dots" id="imageDots"></div>
+      <p id="productDescription">Beschreibung hier...</p>
+      <div class="buttons">
+        <button class="button button-buy" id="buyNow">Buy Now</button>
+        <button class="button button-cart" id="addToCart">Add to Cart</button>
+      </div>
+      <div style="margin-top:1rem; font-size:0.8rem; color:#555;">
+        <p>• Premium quality materials</p>
+        <p>• Free shipping on orders over €50</p>
+        <p>• 30-day return policy</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Beispielprodukt
+  const product = {
+    id: 1,
+    name: "Cooles Produkt",
+    price: 49.99,
+    description: "Dies ist eine Beschreibung des Produkts.",
+    images: [
+      "https://via.placeholder.com/600x600.png?text=Bild+1",
+      "https://via.placeholder.com/600x600.png?text=Bild+2",
+      "https://via.placeholder.com/600x600.png?text=Bild+3"
+    ]
+  };
+
+  let currentImageIndex = 0;
+  const cart = [];
+
+  const modalOverlay = document.getElementById("modalOverlay");
+  const openModalBtn = document.getElementById("openModal");
+  const closeModalBtn = document.getElementById("closeModal");
+  const productName = document.getElementById("productName");
+  const productPrice = document.getElementById("productPrice");
+  const productDescription = document.getElementById("productDescription");
+  const productImage = document.getElementById("productImage");
+  const imageDots = document.getElementById("imageDots");
+  const addToCartBtn = document.getElementById("addToCart");
+  const buyNowBtn = document.getElementById("buyNow");
+
+  function openModal() {
+    modalOverlay.style.display = "flex";
+    currentImageIndex = 0;
+    updateModal();
+  }
+
+  function closeModal() {
+    modalOverlay.style.display = "none";
+  }
+
+  function updateModal() {
+    productName.textContent = product.name;
+    productPrice.textContent = "€" + product.price.toFixed(2);
+    productDescription.textContent = product.description;
+    productImage.src = product.images[currentImageIndex];
+
+    imageDots.innerHTML = "";
+    product.images.forEach((img, index) => {
+      const dot = document.createElement("div");
+      dot.className = "dot" + (index === currentImageIndex ? " active" : "");
+      dot.onclick = () => { currentImageIndex = index; updateModal(); };
+      imageDots.appendChild(dot);
+    });
+  }
+
+  function nextImage() {
+    currentImageIndex = (currentImageIndex + 1) % product.images.length;
+    updateModal();
+  }
+
+  function prevImage() {
+    currentImageIndex = (currentImageIndex === 0 ? product.images.length - 1 : currentImageIndex - 1);
+    updateModal();
+  }
+
+  function addToCart() {
+    cart.push({...product, quantity:1});
+    alert("Produkt zum Warenkorb hinzugefügt! Gesamte Produkte im Warenkorb: " + cart.length);
+  }
+
+  function buyNow() {
+    addToCart();
+    closeModal();
+    alert("Produkt gekauft!");
+  }
+
+  // Events
+  openModalBtn.addEventListener("click", openModal);
+  closeModalBtn.addEventListener("click", closeModal);
+  addToCartBtn.addEventListener("click", addToCart);
+  buyNowBtn.addEventListener("click", buyNow);
+</script>
+
+</body>
+</html>
